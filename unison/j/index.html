@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>Unirse · Unison Mesh</title>
+<style>
+  :root { --bg: #f4f6f5; --card: #ffffff; --ink: #17222a; --muted: #5a6670; --line: #d4dcda; --accent: #0d7672; --accent-ink: #ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1519; --card: #162027; --ink: #e5ece9; --muted: #95a3aa; --line: #27333b; --accent: #3fc1bb; --accent-ink: #0f1519; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 32rem; margin: 0 auto; padding: 2rem 16px 3rem; display: grid; gap: 1.25rem; }
+  h1 { font-size: 1.7rem; line-height: 1.15; margin: 0; }
+  p { margin: 0; }
+  .muted { color: var(--muted); font-size: 0.95rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem; display: grid; gap: 0.8rem; }
+  .btn { display: block; text-align: center; text-decoration: none; font-weight: 600; padding: 0.9rem 1rem; border-radius: 999px; border: 1px solid var(--line); color: var(--ink); background: transparent; font-size: 1rem; cursor: pointer; width: 100%; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  code { font: 0.85rem/1.4 ui-monospace, Menlo, monospace; word-break: break-all; color: var(--muted); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1 data-es="Te han invitado a escuchar" data-en="You're invited to listen">Te han invitado a escuchar</h1>
+  <p data-es="Unison Mesh convierte los teléfonos cercanos en un altavoz: alguien habla y todos los teléfonos lo reproducen a la vez, sin internet." data-en="Unison Mesh turns nearby phones into one speaker: someone talks and every phone plays it at the same moment, without internet.">Unison Mesh convierte los teléfonos cercanos en un altavoz: alguien habla y todos los teléfonos lo reproducen a la vez, sin internet.</p>
+
+  <section class="card" id="ok" hidden>
+    <a class="btn primary" id="open" href="#" data-es="Abrir en Unison Mesh" data-en="Open in Unison Mesh">Abrir en Unison Mesh</a>
+    <p class="muted" data-es="¿No tienes la app? Instálala y vuelve a escanear el código QR." data-en="Don't have the app? Install it and scan the QR code again.">¿No tienes la app? Instálala y vuelve a escanear el código QR.</p>
+    <a class="btn" id="play" href="https://play.google.com/store/apps/details?id=io.github.jmormal.unisonmesh" rel="noopener" data-es="Instalar desde Google Play" data-en="Get it on Google Play">Instalar desde Google Play</a>
+    <a class="btn" id="fdroid" href="https://f-droid.org/packages/io.github.jmormal.unisonmesh/" rel="noopener" data-es="Instalar desde F-Droid" data-en="Get it on F-Droid">Instalar desde F-Droid</a>
+    <button class="btn" id="copy" type="button" data-es="Copiar el código de la invitación" data-en="Copy the invite code">Copiar el código de la invitación</button>
+    <code id="code"></code>
+  </section>
+
+  <section class="card" id="bad" hidden>
+    <p data-es="Este enlace no contiene una invitación válida. Pide a quien organiza que te enseñe su código QR." data-en="This link doesn't contain a valid invite. Ask the organiser to show you their QR code.">Este enlace no contiene una invitación válida. Pide a quien organiza que te enseñe su código QR.</p>
+  </section>
+
+  <p class="muted" data-es="La invitación va después del símbolo # del enlace: tu navegador no la envía a ningún servidor. Esta página no usa cookies ni estadísticas." data-en="The invite comes after the # in the link: your browser never sends it to any server. This page uses no cookies or analytics.">La invitación va después del símbolo # del enlace: tu navegador no la envía a ningún servidor. Esta página no usa cookies ni estadísticas.</p>
+</main>
+<script>
+(function () {
+  var lang = (navigator.language || 'es').slice(0, 2) === 'es' ? 'es' : 'en';
+  if (lang !== 'es') {
+    document.documentElement.lang = 'en';
+    document.querySelectorAll('[data-en]').forEach(function (el) { el.textContent = el.getAttribute('data-en'); });
+    document.title = 'Join · Unison Mesh';
+  }
+  var code = '';
+  try { code = decodeURIComponent(location.hash.slice(1)); } catch (e) { code = ''; }
+  // Public invites only: Base32 after the protocol prefix, nothing else.
+  var valid = /^OUTCAST1:[A-Z2-7]{16,400}$/.test(code);
+  document.getElementById(valid ? 'ok' : 'bad').hidden = false;
+  if (!valid) return;
+  document.getElementById('code').textContent = code;
+  var pkg = 'io.github.jmormal.unisonmesh';
+  var fallback = 'https://play.google.com/store/apps/details?id=' + pkg;
+  document.getElementById('open').href =
+    'intent://join#Intent;scheme=unisonmesh;package=' + pkg +
+    ';S.invite=' + encodeURIComponent(code) +
+    ';S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end';
+  document.getElementById('copy').addEventListener('click', function () {
+    var btn = this;
+    var done = function () { btn.textContent = lang === 'es' ? 'Copiado' : 'Copied'; };
+    if (navigator.clipboard) navigator.clipboard.writeText(code).then(done, function () {});
+  });
+})();
+</script>
+</body>
+</html>

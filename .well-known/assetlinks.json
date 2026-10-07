@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.jmormal.unisonmesh",
+      "sha256_cert_fingerprints": [
+        "4C:3C:0F:C6:F9:AE:CB:87:C9:12:BF:25:CB:60:79:E8:13:00:4C:E8:AC:5A:9C:A8:DC:2B:71:9C:F3:77:A5:07"
+      ]
+    }
+  }
+]
